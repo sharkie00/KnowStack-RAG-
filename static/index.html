@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>知栈 KnowStack · 操作系统笔记 RAG Demo</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">知</div>
+        <div class="brand-text">
+          <strong>知栈 KnowStack</strong>
+          <span id="brandSubtitle">操作系统 · 笔记 RAG Demo</span>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs">
+        <button class="tab active" data-view="chat">对话</button>
+        <button class="tab" data-view="coverage">覆盖率</button>
+        <button class="tab" data-view="eval">评测</button>
+      </nav>
+      <div class="top-actions">
+        <span id="modePill" class="pill offline">离线抽取</span>
+        <button id="uploadBtn" class="icon-btn" title="导入笔记">＋</button>
+        <button id="settingsBtn" class="icon-btn" title="模型设置">⚙</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="course-card">
+          <div class="eyebrow">当前课程</div>
+          <h1 id="courseName">操作系统</h1>
+          <select id="courseSelect" class="course-select" aria-label="切换课程"></select>
+          <div class="course-stats" id="courseStats">加载中…</div>
+          <button id="newCourseBtn" class="course-add">＋ 新建课程</button>
+          <div class="course-foot">
+            <span class="dot"></span> 本地 SQLite · 可离线运行
+          </div>
+        </div>
+
+        <div class="side-title">
+          <span>概念覆盖</span>
+          <b id="overallCov">—</b>
+        </div>
+        <div id="conceptList" class="concept-list"></div>
+
+        <div class="side-note">
+          点击概念可以直接追问；覆盖率按「定义 / 例子 / 推导或代码 / 练习」四个维度计算。
+        </div>
+      </aside>
+
+      <main class="main">
+        <section id="view-chat" class="view active">
+          <div id="chat" class="chat">
+            <div class="welcome" id="welcome">
+              <div class="kicker" id="welcomeKicker">课程知识库 · 4 份笔记 · 21 个片段</div>
+              <h2>问笔记，<br />而不是问模型。</h2>
+              <p>每个结论都来自你的笔记或教材，并标注出处。没有证据时，它会直接说“没覆盖”。</p>
+              <div class="feature-row">
+                <span>① 引用可回跳</span>
+                <span>② 笔记冲突提示</span>
+                <span>③ 笔记缺口诊断</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="composer-wrap">
+            <div id="suggestions" class="suggestions"></div>
+            <div class="composer">
+              <textarea id="input" rows="1" placeholder="问一个操作系统问题，例如：进程和线程有什么区别？"></textarea>
+              <button id="sendBtn" class="send-btn" title="发送">
+                <span>发送</span>
+                <span class="arrow">↑</span>
+              </button>
+            </div>
+            <div class="hint">回答只来自已入库的笔记与教材；每句带引用，没证据会拒答。</div>
+          </div>
+        </section>
+
+        <section id="view-coverage" class="view">
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Coverage</div>
+              <div class="title-row">
+                <h2>知识缺口仪表盘</h2>
+                <button id="coverageHelp" class="help-btn" title="四维覆盖率怎么算">?</button>
+                <button id="addConceptBtn" class="ghost-btn small">＋ 新增知识点</button>
+              </div>
+              <p>覆盖率不是“读了多少”，而是“每个概念有没有定义、例子、推导和练习”。</p>
+            </div>
+            <div class="ring" id="coverageRing"><span id="ringValue">—</span></div>
+          </div>
+          <div id="coverageGrid" class="coverage-grid"></div>
+        </section>
+
+        <section id="view-eval" class="view">
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Evaluation</div>
+              <h2>小样本评测</h2>
+              <p id="evalIntro">12 道自建题：10 道可答、2 道笔记未覆盖。指标用于回归，不用于对外宣称效果。</p>
+            </div>
+            <button id="runEvalBtn" class="primary-btn">运行评测</button>
+          </div>
+          <div id="metricGrid" class="metric-grid">
+            <div class="metric-card placeholder">点击「运行评测」查看指标</div>
+          </div>
+          <div id="evalTableWrap" class="table-wrap"></div>
+          <div class="fineprint">说明：题目与语料均为自写小样本，结果偏乐观；生产版需扩充到 60–120 题并做双人标注。</div>
+        </section>
+      </main>
+
+      <aside class="evidence" id="evidencePanel">
+        <div class="evidence-head">
+          <span>证据</span>
+          <b id="evidenceCount">0</b>
+        </div>
+        <div id="evidenceList" class="evidence-list">
+          <div class="empty">
+            <div class="empty-icon">⌘</div>
+            提问后，这里会列出引用的原文，点击正文里的 [1] 可以定位。
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>模型设置</h3>
+        <button class="close" data-close="settingsModal">×</button>
+      </div>
+      <p class="modal-desc">默认离线抽取，不调用外部模型。填入 DeepSeek / OpenAI 兼容接口后，可切换为 LLM 生成，引用规则不变。</p>
+      <label class="check-row">
+        <input type="checkbox" id="llmEnabled" />
+        <span>启用 LLM 生成</span>
+      </label>
+      <label>Base URL<input id="baseUrl" placeholder="https://api.deepseek.com/v1" /></label>
+      <label>模型<input id="modelName" placeholder="deepseek-chat" /></label>
+      <label>API Key<input id="apiKey" type="password" placeholder="sk-…（只保存在当前服务内存）" /></label>
+      <div class="modal-actions">
+        <button class="ghost-btn" data-close="settingsModal">取消</button>
+        <button id="saveSettings" class="primary-btn">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="uploadModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>导入笔记</h3>
+        <button class="close" data-close="uploadModal">×</button>
+      </div>
+      <p class="modal-desc">粘贴 Markdown 文本，<code>## 标题</code> 会切成小节；支持增量入库，立刻可检索。</p>
+      <div class="modal-course" id="uploadCourseHint">导入到：操作系统</div>
+      <label>标题<input id="docTitle" placeholder="例如：操作系统笔记 · 死锁补充" /></label>
+      <label>来源
+        <select id="docAuthority">
+          <option value="1">个人笔记（权威度 1）</option>
+          <option value="2">课件 / 讲义（权威度 2）</option>
+          <option value="3">教材 / 真题（权威度 3）</option>
+        </select>
+      </label>
+      <label>内容<textarea id="docText" rows="8" placeholder="## 死锁检测&#10;&#10;死锁检测允许系统进入死锁状态，再通过资源分配图判断是否存在环。"></textarea></label>
+      <div class="modal-actions">
+        <button class="ghost-btn" data-close="uploadModal">取消</button>
+        <button id="submitUpload" class="primary-btn">导入并建索引</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="coverageModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>覆盖率怎么算</h3>
+        <button class="close" data-close="coverageModal">×</button>
+      </div>
+      <p class="modal-desc">覆盖率不是“读了多少”，而是每个概念有没有四类<strong>可复习的证据</strong>。缺哪一类，就补哪一类。</p>
+      <div class="legend">
+        <div><b>定义</b><span>这个概念是什么、边界在哪、关键性质是什么</span></div>
+        <div><b>例子</b><span>一个具体场景、对照或运行示例，能帮你把定义复述出来</span></div>
+        <div><b>推导</b><span>为什么成立、步骤、复杂度分析，或一段可运行代码</span></div>
+        <div><b>练习</b><span>一道能作答的题，附答案要点，用来检验自己</span></div>
+      </div>
+      <div class="formula">覆盖率 = 35% 定义 + 25% 例子 + 20% 推导 + 20% 练习</div>
+      <p class="modal-desc">比如「虚拟内存」缺例子：补一段从逻辑地址到物理地址的换算；缺练习：补一道页表大小的计算题。</p>
+      <div class="modal-actions">
+        <button class="primary-btn" data-close="coverageModal">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="courseModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>新建课程</h3>
+        <button class="close" data-close="courseModal">×</button>
+      </div>
+      <p class="modal-desc">建完后导入一份带 <code>## 小节标题</code> 的 Markdown 笔记，系统会自动抽取概念、建索引，并开始计算覆盖率。</p>
+      <label>课程名<input id="newCourseName" placeholder="例如：计算机网络" /></label>
+      <label>一句话描述<input id="newCourseDesc" placeholder="例如：TCP/IP、HTTP、路由" /></label>
+      <div class="modal-actions">
+        <button class="ghost-btn" data-close="courseModal">取消</button>
+        <button id="submitCourse" class="primary-btn">创建课程</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="notesModal">
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <h3 id="notesTitle">编辑笔记</h3>
+        <button class="close" data-close="notesModal">×</button>
+      </div>
+      <p class="modal-desc">选择这条知识点下的笔记，直接修改正文；保存后会自动重新切块、重建索引并刷新覆盖率。</p>
+      <label>选择笔记<select id="noteSelect"></select></label>
+      <label>标题<input id="noteTitle" /></label>
+      <label>正文<textarea id="noteText" rows="12"></textarea></label>
+      <div class="modal-actions">
+        <button class="ghost-btn" data-close="notesModal">取消</button>
+        <button id="saveNote" class="primary-btn">保存并重建</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="fillModal">
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <h3 id="fillTitle">补全知识点</h3>
+        <button class="close" data-close="fillModal">×</button>
+      </div>
+      <p class="modal-desc" id="fillHint">补例子、推导、练习；保存后会新增一张「补全卡」并重新计算覆盖率。</p>
+      <label>例子<textarea id="fillExample" rows="3"></textarea></label>
+      <label>推导 / 代码<textarea id="fillDerivation" rows="3"></textarea></label>
+      <label>练习<textarea id="fillPractice" rows="3"></textarea></label>
+      <div class="modal-actions">
+        <button class="ghost-btn" data-close="fillModal">取消</button>
+        <button id="saveFill" class="primary-btn">保存补全卡</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="conceptModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>新增知识点</h3>
+        <button class="close" data-close="conceptModal">×</button>
+      </div>
+      <p class="modal-desc">新增一个知识点和它的第一条定义笔记；保存后可在覆盖率里继续补例子、推导和练习。</p>
+      <label>知识点名称<input id="conceptName" placeholder="例如：动态规划" /></label>
+      <label>定义 / 要点<textarea id="conceptDefinition" rows="5" placeholder="定义：动态规划通过状态与转移方程保存子问题结果……"></textarea></label>
+      <div class="modal-actions">
+        <button class="ghost-btn" data-close="conceptModal">取消</button>
+        <button id="saveConcept" class="primary-btn">新增知识点</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

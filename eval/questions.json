@@ -1,0 +1,18 @@
+[
+  {"id": "q01", "courseId": "os", "question": "进程和线程有什么区别？", "concepts": ["process", "thread"], "keywords": ["资源分配", "调度", "地址空间"], "answerable": true},
+  {"id": "q02", "courseId": "os", "question": "为什么线程切换比进程切换便宜？", "concepts": ["thread", "context_switch"], "keywords": ["页表", "TLB"], "answerable": true},
+  {"id": "q03", "courseId": "os", "question": "死锁的四个必要条件是什么？", "concepts": ["deadlock"], "keywords": ["互斥", "占有并等待", "不可剥夺", "循环等待"], "answerable": true},
+  {"id": "q04", "courseId": "os", "question": "生产者消费者里，为什么 P 操作的顺序不能反？", "concepts": ["semaphore"], "keywords": ["死锁", "mutex"], "answerable": true},
+  {"id": "q05", "courseId": "os", "question": "为什么需要 TLB？", "concepts": ["tlb", "page_table"], "keywords": ["页表", "缓存"], "answerable": true},
+  {"id": "q06", "courseId": "os", "question": "缺页中断的完整处理流程是什么？", "concepts": ["page_fault"], "keywords": ["有效位", "牺牲页", "重新执行"], "answerable": true},
+  {"id": "q07", "courseId": "os", "question": "多级页表为什么能节省内存？", "concepts": ["multilevel_page_table", "page_table"], "keywords": ["稀疏", "页表内存"], "answerable": true},
+  {"id": "q08", "courseId": "os", "question": "LRU 怎么实现 O(1)？", "concepts": ["lru"], "keywords": ["哈希表", "双向链表"], "answerable": true},
+  {"id": "q09", "courseId": "os", "question": "进程切换会换页表吗？", "concepts": ["process", "page_table", "context_switch"], "keywords": ["页表", "线程"], "answerable": true},
+  {"id": "q10", "courseId": "os", "question": "页缓存和虚拟内存是什么关系？", "concepts": ["page_cache", "virtual_memory"], "keywords": ["页表", "脏页"], "answerable": true},
+  {"id": "q11", "courseId": "os", "question": "什么是 zswap？", "concepts": [], "keywords": [], "answerable": false},
+  {"id": "q12", "courseId": "os", "question": "Linux CFS 的 vruntime 计算公式是什么？", "concepts": [], "keywords": [], "answerable": false},
+  {"id": "q13", "courseId": "ds", "question": "栈和队列有什么区别？", "concepts": ["stack", "queue"], "keywords": ["后进先出", "先进先出"], "answerable": true},
+  {"id": "q14", "courseId": "ds", "question": "快速排序最坏为什么是 O(n²)？", "concepts": ["quicksort", "complexity"], "keywords": ["枢轴", "递归深度", "O(n²)"], "answerable": true},
+  {"id": "q15", "courseId": "ds", "question": "怎么判断链表有环？", "concepts": ["linked_list", "fast_slow_pointer"], "keywords": ["快慢指针", "相遇"], "answerable": true},
+  {"id": "q16", "courseId": "ds", "question": "什么是 B+ 树？", "concepts": [], "keywords": [], "answerable": false}
+]

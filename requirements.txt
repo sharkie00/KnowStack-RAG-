@@ -1,0 +1,2 @@
+# KnowStack Demo 没有第三方运行时依赖，仅使用 Python 3.10+ 标准库。
+# 保留此文件是为了让部署平台识别 Python 项目。

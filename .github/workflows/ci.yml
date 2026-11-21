@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile
+        run: python -m py_compile rag.py server.py scripts/check_data.py
+      - name: Validate seed data
+        run: python scripts/check_data.py
+      - name: Rebuild and check coverage
+        run: |
+          python - <<'PY'
+          import rag
+          print(rag.rebuild())
+          for course in rag.course_configs():
+              payload = rag.coverage_payload(rag.connect(), course["id"])
+              assert payload["overall"] >= 0.95, (course["id"], payload["overall"])
+              print(course["id"], payload["overall"])
+          PY

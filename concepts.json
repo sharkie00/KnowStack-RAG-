@@ -1,0 +1,137 @@
+{
+  "courses": [
+    {
+      "id": "os",
+      "name": "操作系统",
+      "dir": "os",
+      "description": "进程、内存、文件与 I/O",
+      "concepts": [
+        {"id": "process", "name": "进程", "aliases": ["process"], "parent": null, "weight": 1.5},
+        {"id": "thread", "name": "线程", "aliases": ["thread"], "parent": "process", "weight": 1.5},
+        {"id": "context_switch", "name": "上下文切换", "aliases": ["context switch", "进程切换", "线程切换"], "parent": "process", "weight": 1.4},
+        {"id": "deadlock", "name": "死锁", "aliases": ["deadlock"], "parent": null, "weight": 1.3},
+        {"id": "semaphore", "name": "信号量", "aliases": ["semaphore", "PV操作"], "parent": null, "weight": 1.2},
+        {"id": "virtual_memory", "name": "虚拟内存", "aliases": ["virtual memory"], "parent": null, "weight": 1.5},
+        {"id": "page_table", "name": "页表", "aliases": ["page table", "页表项"], "parent": "virtual_memory", "weight": 1.5},
+        {"id": "multilevel_page_table", "name": "多级页表", "aliases": ["multi-level page table"], "parent": "page_table", "weight": 1.2},
+        {"id": "tlb", "name": "TLB", "aliases": ["快表", "translation lookaside buffer"], "parent": "page_table", "weight": 1.4},
+        {"id": "page_fault", "name": "缺页中断", "aliases": ["page fault", "缺页异常"], "parent": "virtual_memory", "weight": 1.5},
+        {"id": "page_replacement", "name": "页面置换", "aliases": ["page replacement", "页面置换算法"], "parent": "virtual_memory", "weight": 1.2},
+        {"id": "lru", "name": "LRU", "aliases": ["最近最少使用", "least recently used"], "parent": "page_replacement", "weight": 1.3},
+        {"id": "page_cache", "name": "页缓存", "aliases": ["page cache"], "parent": null, "weight": 1.2},
+        {"id": "syscall", "name": "系统调用", "aliases": ["system call"], "parent": null, "weight": 1.2}
+      ],
+      "conflicts": [
+        {
+          "concept_id": "context_switch",
+          "concept": "上下文切换",
+          "wrong": "进程切换不会切换页表",
+          "correct": "进程切换必须切换页表",
+          "keywords": ["换页表", "进程切换"],
+          "advice": "以教材为准：进程切换需要切换页表；线程切换才通常不换。笔记中的说法混淆了进程与线程。"
+        },
+        {
+          "concept_id": "page_fault",
+          "concept": "缺页中断",
+          "wrong": "有效位为 1 表示该页不在内存",
+          "correct": "有效位为 0 表示该页不在内存",
+          "keywords": ["有效位", "缺页"],
+          "advice": "以教材为准：有效位为 0 表示页不在内存，访问会触发缺页中断。"
+        }
+      ]
+    },
+    {
+      "id": "ds",
+      "name": "数据结构",
+      "dir": "ds",
+      "description": "线性表、树、排序与哈希",
+      "concepts": [
+        {"id": "stack", "name": "栈", "aliases": ["stack"], "parent": null, "weight": 1.4},
+        {"id": "queue", "name": "队列", "aliases": ["queue"], "parent": null, "weight": 1.4},
+        {"id": "linked_list", "name": "链表", "aliases": ["linked list", "单链表"], "parent": null, "weight": 1.4},
+        {"id": "fast_slow_pointer", "name": "快慢指针", "aliases": ["快慢指针法"], "parent": "linked_list", "weight": 1.3},
+        {"id": "binary_tree", "name": "二叉树", "aliases": ["binary tree"], "parent": null, "weight": 1.5},
+        {"id": "traversal", "name": "遍历", "aliases": ["前序遍历", "中序遍历", "后序遍历", "层序遍历"], "parent": "binary_tree", "weight": 1.4},
+        {"id": "heap", "name": "堆", "aliases": ["heap", "小顶堆", "大顶堆"], "parent": null, "weight": 1.3},
+        {"id": "priority_queue", "name": "优先队列", "aliases": ["priority queue"], "parent": "heap", "weight": 1.2},
+        {"id": "quicksort", "name": "快速排序", "aliases": ["quicksort", "快排"], "parent": null, "weight": 1.5},
+        {"id": "complexity", "name": "时间复杂度", "aliases": ["time complexity", "大O"], "parent": null, "weight": 1.4},
+        {"id": "hash_table", "name": "哈希表", "aliases": ["hash table", "散列表"], "parent": null, "weight": 1.4},
+        {"id": "hash_collision", "name": "冲突", "aliases": ["哈希冲突", "collision"], "parent": "hash_table", "weight": 1.2}
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "math",
+      "name": "高等数学",
+      "description": "极限、微积分、级数与多元函数",
+      "seed": "seed_data/math.json",
+      "concepts": [],
+      "conflicts": []
+    },
+    {
+      "id": "discrete",
+      "name": "离散数学",
+      "description": "逻辑、集合、图论与代数结构",
+      "seed": "seed_data/discrete.json",
+      "concepts": [],
+      "conflicts": []
+    },
+    {
+      "id": "ds_algo",
+      "name": "数据结构与算法",
+      "description": "线性表、树、图、排序与算法设计",
+      "seed": "seed_data/ds_algo.json",
+      "concepts": [],
+      "conflicts": []
+    },
+    {
+      "id": "network",
+      "name": "计算机网络",
+      "description": "TCP/IP、HTTP、路由与网络安全",
+      "seed": "seed_data/network.json",
+      "concepts": [],
+      "conflicts": []
+    },
+    {
+      "id": "database",
+      "name": "数据库系统",
+      "description": "关系模型、SQL、事务、索引与分布式",
+      "seed": "seed_data/database.json",
+      "concepts": [],
+      "conflicts": []
+    },
+    {
+      "id": "software",
+      "name": "软件工程",
+      "description": "需求、设计、测试、敏捷与项目管理",
+      "seed": "seed_data/software.json",
+      "concepts": [],
+      "conflicts": []
+    },
+    {
+      "id": "organization",
+      "name": "计算机组成原理",
+      "description": "CPU、存储层次、指令系统与总线",
+      "seed": "seed_data/organization.json",
+      "concepts": [],
+      "conflicts": []
+    },
+    {
+      "id": "java",
+      "name": "Java 程序设计",
+      "description": "面向对象、集合、并发与 Spring 生态",
+      "seed": "seed_data/java.json",
+      "concepts": [],
+      "conflicts": []
+    },
+    {
+      "id": "python",
+      "name": "Python 开发",
+      "description": "语法、数据结构、并发、Web 与工程化",
+      "seed": "seed_data/python.json",
+      "concepts": [],
+      "conflicts": []
+    }
+  ]
+}
